@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Ákos és Kriszti térképe</title>
+    <title>A és K térképe</title>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -57,7 +57,7 @@
 	};
 
 	info.update = function (props) {
-		this._div.innerHTML = '<h4>Nézzük csak, merre is koslattak?</h4>' +  (props ?
+		this._div.innerHTML = '<h4>Nézzük csak, merre is jártak?</h4>' +  (props ?
 			'<b>' + props.name + '</b><br />' + props.ki + ' járt itt'
 			: 'Hover over a state');
 	};
@@ -161,11 +161,11 @@ var legend = L.control({position: 'bottomright'});
     <table class="map-legend" style="width:100px">
     <tr>
         <td class="akos"></td>
-        <td>Ákos</td>
+        <td>A</td>
     </tr>
     <tr>
         <td class="kriszti"></td>
-        <td>Kriszti</td>
+        <td>K</td>
     </tr>
     <tr>
         <td class="kozos"></td>
