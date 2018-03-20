@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ákos és Kriszti térképe</title>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="leaflet.css" />
+    <script src="leaflet.js"></script>
+	<script src="libraries/p5.js"></script>
+	<script src="libraries/p5.dom.js"></script>
+	<script src="libraries/p5.sound.js"></script>
+	<script src="sketch.js"></script>
+    
+	<style>
+    #map{ height: 100% }
+  
+        body {
+			margin:0;
+			padding:0;
+			overflow: hidden;
+		}
+		canvas {
+			margin:auto;
+		}
+	</style>
+</head>
+<body>
+      <div id="leafletmap"></div>
+
+<script type="text/javascript" src="countries.geo.json"></script>
+
+  <script type="text/javascript">
+  // basemap
+  // initialize the map
+  var themap = L.map('leafletmap').setView([47.49, 19.04], 7);
+
+  // load a tile layer
+    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18,
+    minZoom: 1,          
+    id: 'mapbox.pencil',
+    accessToken: 'pk.eyJ1IjoidmVzemV0dGZlanN6ZSIsImEiOiJjamJmOWNkeWkyM3R0MzFub2xmbHZtZ3JqIn0.Y2ytr6uYYyMjd9P-8-06Qg'
+    }).addTo(themap);
+      
+    //var myLayer = L.geoJSON(countries).addTo(themap);
+      //myLayer.addData(countries);
+      
+// control that shows state info on hover
+	var info = L.control();
+
+	info.onAdd = function (map) {
+		this._div = L.DomUtil.create('div', 'info');
+		this.update();
+		return this._div;
+	};
+
+	info.update = function (props) {
+		this._div.innerHTML = '<h4>Nézzük csak, merre is koslattak?</h4>' +  (props ?
+			'<b>' + props.name + '</b><br />' + props.ki + ' járt itt'
+			: 'Hover over a state');
+	};
+
+	info.addTo(themap);      
+      
+    // polygon colors scheme
+      
+function getColor(ki) {
+        
+        return ki > 4  ? '#E31A1C' :
+				ki > 3  ? '#018571' :
+				ki > 2   ? '#80cdc1' :
+				ki > 1   ? '#dfc27d' :
+				ki > 0   ? '#a6611a' :
+							'#f5f5f5';
+    
+}
+      //layer style
+function style(feature) {
+    return {
+        weight: 2,
+			opacity: 1,
+			color: 'white',
+			dashArray: '3',
+			fillOpacity: 0.5,
+			fillColor: getColor(feature.properties.ki),
+        //if (getColor(feature.properties.ki) < 1) {fillOpacity: 0,1;
+   // } else { fillOpacity : 0,7};
+    };
+}
+function highlightFeature(e) {
+		var layer = e.target;
+
+		layer.setStyle({
+			weight: 5,
+			color: '#666',
+			dashArray: '',
+			fillOpacity: 0.7
+		});
+
+		if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+			layer.bringToFront();
+		}
+
+		info.update(layer.feature.properties);
+	}
+var geojson;
+
+function resetHighlight(e) {
+		geojson.resetStyle(e.target);
+		info.update();
+	}
+
+function zoomToFeature(e) {
+		themap.fitBounds(e.target.getBounds());
+	}
+
+function onEachFeature(feature, layer) {
+		layer.on({
+			mouseover: highlightFeature,
+			mouseout: resetHighlight,
+			click: zoomToFeature
+		});
+	}
+var geojson = L.geoJson(countries, {
+		style: style,
+        onEachFeature: onEachFeature
+	}).addTo(themap);
+      
+var legend = L.control({position: 'bottomright'});
+
+	legend.onAdd = function (themap) {
+
+		var div = L.DomUtil.create('div', 'info legend'),
+			//grades = ["egyikük sem","csak Ákos","csak Kriszti","külön-külön","együtt"],
+  		grades = [0, 1, 2, 3, 4, 5,6,],
+			labels = [],
+			from, to;
+
+		for (var i = 0; i < grades.length; i++) {
+			from = grades[i];
+			to = grades[i + 1];
+
+			labels.push(
+				'<i style="background:' + getColor(from + 1) + '"></i> ' +
+				from + (to ? '&ndash;' + to : '+'));
+		}
+
+		div.innerHTML = labels.join('<br>');
+		return div;
+	};
+
+
+	legend.addTo(themap);
+
+
+      
+  </script>
+
+    <table class="map-legend" style="width:100px">
+    <tr>
+        <td class="akos"></td>
+        <td>Ákos</td>
+    </tr>
+    <tr>
+        <td class="kriszti"></td>
+        <td>Kriszti</td>
+    </tr>
+    <tr>
+        <td class="kozos"></td>
+        <td>Közös</td>
+    </tr>
+    </table>
+    
+</body>
+</html>
